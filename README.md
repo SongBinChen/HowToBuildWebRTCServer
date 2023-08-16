@@ -57,11 +57,37 @@ sudo make install
 ```
 
 ### Signal Service
-
+```
+#create go directory
+mkdir -p /home/user_name/webrtc/goWorkspace/src
+echo "export GOPATH=/home/user_name/webrtc/goWorkspace" >> ~/.zshrc
+source  ~/.zshrc
+cd /home/user_name/webrtc
+git clone git://github.com/webrtc/apprtc.git
+ln -s /home/user_name/webrtc/apprtc/src/collider/collider $GOPATH/src
+ln -s /home/user_name/webrtc/apprtc/src/collider/collidermain $GOPATH/src
+ln -s /home/user_name/webrtc/apprtc/src/collider/collidertest $GOPATH/src
+go get collidermain
+go install collidermain
+```
 
 ### STUN/TURN Service
+```
+cd /home/user_name/webrtc
+wget http://coturn.net/turnserver/v4.5.0.7/turnserver-4.5.0.7.tar.gz
+tar xvfz turnserver-4.5.0.7.tar.gz
+cd turnserver-4.5.0.7
+./configure
+make
+sudo make install
+```
 
-### WebRTC Client Service
+### Build AppRTC
+```
+cd /home/user_name/webrtc/apprtc
+npm install --no-fund
+grunt build
+```
 
 ## Configuration
 
@@ -69,11 +95,10 @@ sudo make install
 
 ### Signal Service
 
-### Go directory
-
 ## Certification
 
 ## Run Service
+### Nginx
 
 ## Test
 
