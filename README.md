@@ -13,14 +13,14 @@ WebRTC Demo project: https://github.com/webrtc/apprtc
 3. Software:git、tar、wget、unzip
 4. Development tools:NodeJS、Python、Golang
    
-Install Common Tools:
+Common Tools:
 ```
 sudo apt-get update 
 sudo apt-get upgrade
 sudo apt install -y nodejs npm python golang-go unzip git-core tar wget openjdk-8-jdk
 ```
 
-Install **node.js**:
+**node.js**:
 ```
 sudo apt install nodejs
 # check version
@@ -38,7 +38,7 @@ npm install --dev coffeescript
 ```
 
 ### Dependence Service
-Install **google_appengine**:
+**google_appengine**:
 ```
 mkdir webrtc
 cd webrtc
@@ -46,7 +46,7 @@ wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9
 unzip google_appengine_1.9.40.zip
 echo "export PATH=$PATH:/home/user_name/webrtc/google_appengine" >> ~/.zshrc
 ```
-Install **libevent**:
+**libevent**:
 ```
 wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz
 tar xvf libevent-2.0.21-stable.tar.gz
