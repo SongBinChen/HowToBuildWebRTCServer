@@ -285,6 +285,33 @@ nginx -s reload
 
 ## Certification
 
+### 使用第三方签发证书
+修改collider源码
+         进入GOPATH下src/collidermain/main.go修改，修改房间服务器地址为我们前面的房间服务器地址
+
+         var roomSrv = flag.String(“room-server”, “https://windlazio.cn“, “The origin of the room server”)
+
+         编辑$GOPATH/src/collider/collider.go，设置信令服务器所需要用的HTTPS的证书文件, 找到如下代码,注释后改为这样:
+
+         e = server.ListenAndServeTLS(“/usr/nginx/conf/ssl/apprtc.pem”, “/usr/nginx/conf/ssl/apprtc.key”)
+
+         注：这里的nginx路径是后面搭建的反向代理服务器，两个服务器使用一个证书，这个证书必须是第三方签名机构颁发的证书，自签证书无效，证书申请必须先申请个域名。
+
+### 使用HTTPS无法访问，提示 ERR_CONNECTION_RESET 连接已重置
+
+情况如下：
+一、通过HTTP+域名方式访问正常
+即访问http+yy.youyou.work能访问，说明域名已解析成功
+
+二、通过HTTPS+IP方式访问正常
+即访问https+IP能访问，说明防火墙对443端口已经放开
+
+三、通过HTTPS+域名方式访问异常
+即访问https+yy.youyou.work访问，提示ERR_CONNECTION_RESET
+wget https+yy.youyou.work 也提示无法建立SSL连接
+
+解决： 需要先进行备案成功
+
 
 ## Test
 Open the website `www.domainname.com`
