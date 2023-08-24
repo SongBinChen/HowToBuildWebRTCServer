@@ -318,24 +318,20 @@ Open the website `www.domainname.com`
 
 ## Troubleshooting
 ### Start AppRTC
-Error:
-```
-ImportError: No module named _sqlite3
-```
+`ImportError: No module named _sqlite3`
 Switch to pytho2.7.9 below and add param when configure:
 ```
 ./configure --enable-loadable-sqlite-extensions
 ```
 ### Start nginx
-```
-nginx: [error] invalid PID number "" in "/run/nginx.pid"
-```
+`nginx: [error] invalid PID number "" in "/run/nginx.pid"`
 Relocate nginx confiure file:
 ```
  sudo nginx -c /etc/nginx/nginx.conf
  sudo nginx -s reload
 ```
-
+## WebSocket Error
+`Messages:  WebSocket open error: WebSocket error.WebSocket register error: WebSocket error.`
 
 
 ## Reference
