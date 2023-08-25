@@ -9,7 +9,7 @@ WebRTC Demo project: https://github.com/webrtc/apprtc
 ### Environment
 
 1. Server is setup on cloud service with Ubuntu18.04.
-2. Open common ports(3478、8080、8089、80、443) on cloud server firewall.
+2. Open common ports(3478、8080、8089、8088、80、443) on cloud server firewall.
 3. Software:git、tar、wget、unzip
 4. Development tools:NodeJS、Python、Golang
    
@@ -173,17 +173,17 @@ Change **ICE** and **WSS** configuration:
 ICE_SERVER_BASE_URL = 'https://www.domainname.com'
 ...
  # Dictionary keys in the collider instance info constant.
- **WSS_INSTANCE_HOST_KEY = 'www.domainname.com:8089' // Apply from cloud service provider
+ **WSS_INSTANCE_HOST_KEY = 'www.domainname.com:8088' // Apply from cloud service provider
  WSS_INSTANCE_NAME_KEY = 'vm_name'
  WSS_INSTANCE_ZONE_KEY = 'zone'
  WSS_INSTANCES = [{
      WSS_INSTANCE_HOST_KEY: 'apprtc-ws.webrtc.org:443',
-     WSS_INSTANCE_HOST_KEY: 'www.domainname.com:8089', // Apply from cloud service provider
+     WSS_INSTANCE_HOST_KEY: 'www.domainname.com:8088', // Apply from cloud service provider
      WSS_INSTANCE_NAME_KEY: 'wsserver-std',
      WSS_INSTANCE_ZONE_KEY: 'us-central1-a'
  }, {
      WSS_INSTANCE_HOST_KEY: 'apprtc-ws-2.webrtc.org:443',
-     WSS_INSTANCE_HOST_KEY: 'www.domainname.com:8089', // Apply from cloud service provider
+     WSS_INSTANCE_HOST_KEY: 'www.domainname.com:8088', // Apply from cloud service provider
      WSS_INSTANCE_NAME_KEY: 'wsserver-std-2',
      WSS_INSTANCE_ZONE_KEY: 'us-central1-f'
  }]
@@ -193,11 +193,11 @@ Compile apprtc and run:
 npm install --no-fund
 grunt build
 ## run
-sudo nohup dev_appserver.py --host=$LOCAL_IP /user/apprtc/out/app_engine --skip_sdk_update_check &
+sudo nohup dev_appserver.py --host=$LOCAL_IP --port=8090 /user/apprtc/out/app_engine --skip_sdk_update_check &
 
 ```
 ### Nginx
-Modify the configuation file. `/etc/nginx/nginx.conf`
+Modify the configuation file for web proxy. `/etc/nginx/nginx.conf`
 ```
 http {
 
@@ -242,7 +242,7 @@ http {
 	include /etc/nginx/sites-enabled/*;
     upstream roomserver {
          ## your cloud server IP
-        server external IP:8080;
+        server external IP:8090;
     }
     server {
      root /usr/share/nginx/html;
@@ -274,6 +274,36 @@ http {
      return 301 https://roomserver$request_uri;
     }
 }
+
+Add another nginx configuation file for websocket proxy. `/etc/nginx/conf.d/apprtc-websocket-proxy.conf`
+
+```
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+upstream websocket {
+    server 101.34.242.8:8089;
+}
+
+server {
+    listen 8088;
+    ssl on;
+    ssl_certificate /home/ubuntu/cert/songbinchen.top_bundle.pem;
+    ssl_certificate_key /home/ubuntu/cert/songbinchen.top.key;
+
+    server_name www.songbinchen.top;
+    location /ws {
+        proxy_pass http://websocket;
+        proxy_http_version 1.1;
+        proxy_connect_timeout 4s; #配置点1
+        proxy_read_timeout 6000s; #配置点2，如果没效，可以考虑这个时间配置长一点
+        proxy_send_timeout 6000s; #配置点3
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+```
+
 ```
 Run nginx:
 ```
@@ -319,12 +349,14 @@ Open the website `www.domainname.com`
 ## Troubleshooting
 ### Start AppRTC
 `ImportError: No module named _sqlite3`
+
 Switch to pytho2.7.9 below and add param when configure:
 ```
 ./configure --enable-loadable-sqlite-extensions
 ```
 ### Start nginx
 `nginx: [error] invalid PID number "" in "/run/nginx.pid"`
+
 Relocate nginx confiure file:
 ```
  sudo nginx -c /etc/nginx/nginx.conf
@@ -332,6 +364,10 @@ Relocate nginx confiure file:
 ```
 ## WebSocket Error
 `Messages:  WebSocket open error: WebSocket error.WebSocket register error: WebSocket error.`
+
+check if apprtc bind port is the same as roomserver port in apprtc-websocket-proxy.conf
+Default port of apprtc is 8080.
+
 
 
 ## Reference
